@@ -1,25 +1,25 @@
 from PIL import Image
 from numpy import asarray, array
 
-def hide(message: str, image: str):
-    image = Image.open("eren.png")
+def hide(message: str, image_loc: str, result_image: str = "cache.png"):
+    image = Image.open(image_loc)
     data = asarray(image)
     donnees = array(data)
 
     # on convertit le message en binaire
-    message = "Bonjour"
+    message = message
     message_binaire = ""
     for elt in message:
         binary = bin(ord(elt))[2:]
         while len(binary) < 8:
             binary = "0" + binary
         message_binaire += binary
+
     taille_binaire = bin(len(message_binaire))[2:]
     while len(taille_binaire) < 8:
         taille_binaire = "0" + taille_binaire
 
     message_binaire = taille_binaire + message_binaire
-    print(f"taille message binaire: {taille_binaire}, message binaire: {message_binaire}")
     # on va parcourir notre tableau pour cacher le message dans chaque bits de chaque pixels
     tour = 0
     for i in range(len(donnees)):
@@ -34,16 +34,13 @@ def hide(message: str, image: str):
                 # print(f"octet: {message_binaire[tour]} \n")
                 tour += 1
                 if tour >= len(message_binaire):
-                    print("On fait un break et on discute")
                     break
             if tour >= len(message_binaire):
-                print("On fait un break et on discute")
                 break
         if tour >= len(message_binaire):
-            print("On fait un break et on discute")
             break
 
-    Image.fromarray(donnees).save("cache.png")
+    Image.fromarray(donnees).save(result_image)
 
 def read(image: str):
     # on cherche d'abord la taille du message a lire
@@ -59,17 +56,13 @@ def read(image: str):
                 taille_message += bit[-1]
                 x += 1
                 if x >= 8:
-                    print("on fait un break et on discute")
                     break
             if x >= 8:
-                print("on fait un break et on discute")
                 break
         if x >= 8:
-            print("on fait un break et on discute")
             break
     
     message_lenght = int(taille_message, 2)
-    print(message_lenght)
     
     tour = 0
     message = ""
@@ -85,14 +78,41 @@ def read(image: str):
                 break
         if tour >= (message_lenght + 8):
             break    
-    print(message)
+    
+    # on converti le message en chaine de caractere
+    # sans oublier que chaque lettre etait encodee sur 8 bits
+    clear_message = ""
+    lettre = ""
+    x = 0
+    liste = []
+    for i in range(len(message) + 1):
+        if x < 8:
+            lettre += message[i]
+            x += 1
+        else:
+            liste.append(lettre)
+            lettre = ""
+            try:
+                lettre += message[i]
+            except IndexError:
+                pass
+
+            x = 1
+    
+    for elt in liste:
+        clear_message += chr(int(elt, 2))
+    
+    print(clear_message)
+    
+        
 
 
 if __name__ == "__main__":
-    hide("Bonjour", "eren.png")
+    hide("Toko s'en sort en programmation", "eren.png")
     read("cache.png")
     
     """
     01000010011011110110111001101010011011110111010101110010
     01000010011011110110111001101010011011110111010101110010
+    01101111
     """
