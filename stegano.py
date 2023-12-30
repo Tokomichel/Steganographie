@@ -14,11 +14,11 @@ def hide(message: str, image_loc: str, result_image: str = "cache.png"):
         while len(binary) < 8:
             binary = "0" + binary
         message_binaire += binary
-
     taille_binaire = bin(len(message_binaire))[2:]
-    while len(taille_binaire) < 8:
+    while len(taille_binaire) < 16:
         taille_binaire = "0" + taille_binaire
-
+        
+    print(len(message_binaire), taille_binaire)
     message_binaire = taille_binaire + message_binaire
     # on va parcourir notre tableau pour cacher le message dans chaque bits de chaque pixels
     tour = 0
@@ -42,7 +42,7 @@ def hide(message: str, image_loc: str, result_image: str = "cache.png"):
 
     Image.fromarray(donnees).save(result_image)
 
-def read(image: str):
+def read(image: str, encode_lenght: int = 16):
     # on cherche d'abord la taille du message a lire
     data = asarray(Image.open(image))
     taille_message = ""
@@ -55,64 +55,79 @@ def read(image: str):
                 bit = bin(data[i][j][k])[2:]
                 taille_message += bit[-1]
                 x += 1
-                if x >= 8:
+                if x >= encode_lenght:
                     break
-            if x >= 8:
+            if x >= encode_lenght:
                 break
-        if x >= 8:
+        if x >= encode_lenght:
             break
     
     message_lenght = int(taille_message, 2)
+    print(message_lenght, taille_message)
     
     tour = 0
     message = ""
     for i in range(len(data)):
         for j in range(len(data[i])):
             for k in range(len(data[i][j])):
-                if tour >= 8:
+                if tour >= encode_lenght:
                     message += bin(data[i][j][k])[-1]
                 tour += 1
-                if tour >= (message_lenght + 8):
+                if tour >= (message_lenght + encode_lenght):
                     break
-            if tour >= (message_lenght + 8):
+            if tour >= (message_lenght + encode_lenght):
                 break
-        if tour >= (message_lenght + 8):
+        if tour >= (message_lenght + encode_lenght):
             break    
     
     # on converti le message en chaine de caractere
     # sans oublier que chaque lettre etait encodee sur 8 bits
     clear_message = ""
-    lettre = ""
     x = 0
-    liste = []
-    for i in range(len(message) + 1):
-        if x < 8:
-            lettre += message[i]
-            x += 1
-        else:
-            liste.append(lettre)
-            lettre = ""
-            try:
-                lettre += message[i]
-            except IndexError:
-                pass
-
-            x = 1
+    liste = split_by(message, 8)
     
     for elt in liste:
         clear_message += chr(int(elt, 2))
     
-    print(clear_message)
-    
+    print(clear_message)    
+
+def split_by(chaine: str, lenght: int) -> list:
+
+    x = 0
+    lettre = ""
+    liste = []
+    clear_liste = []
+    for elt in chaine:
+        lettre += elt
         
+        if x < (lenght - 1):
+            x += 1 
+        else:
+            liste.append(lettre)
+            lettre = ""
+            x = 0
+    
+    return liste
+    
 
-
+        
+          
 if __name__ == "__main__":
-    hide("Toko s'en sort en programmation", "eren.png")
+    hide("Je fais un teste plus performant avec un texte plus grand voir si ca marche", "eren.png")
     read("cache.png")
     
+    
+    # chaine = "010010100110010100100000011101000110010101110011011101000110010100100000011101010110111000100000"
+    # split_by(chaine, 8)
+    
     """
-    01000010011011110110111001101010011011110111010101110010
-    01000010011011110110111001101010011011110111010101110010
-    01101111
+    01001010011001010010000001110100011001010111001101110100011001010010000001110101011011100010000001110000011
+    0010101010111010100100000011011000110000100100000011100100110010101100111011011000110010100100000011001000
+    11001010111001100100000001100110011000100100000011000110110000101110010011000010110
+    001101110100011001010111001001100101011100110010000001110110011011110110100101110010001000000111001101101001
+    
+    0100101001100101001000000111010001100101011100110111010001100101001000000111010101101110001000000111000001100
+    101011101010010000001101100011000010010000001110010011001010110011101101100011001010010000
     """
+    
+    
