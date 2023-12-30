@@ -14,7 +14,11 @@ def hide(message: str, image_loc: str, result_image: str = "cache.png"):
         while len(binary) < 8:
             binary = "0" + binary
         message_binaire += binary
-    taille_binaire = bin(len(message_binaire))[2:]
+    
+    taille_binaire = bin(len(message_binaire))[2:] # on converti en binaire la taille du message
+    
+    # on determine la longueur en binaire de la taille.
+    # on encode la taille sur 16 bits ainsi on aura environ 2ko d'espace
     while len(taille_binaire) < 16:
         taille_binaire = "0" + taille_binaire
         
@@ -63,7 +67,7 @@ def read(image: str, encode_lenght: int = 16):
             break
     
     message_lenght = int(taille_message, 2)
-    print(message_lenght, taille_message)
+    print(f"taille du message: {message_lenght}, taille message bin: {taille_message}")
     
     tour = 0
     message = ""
@@ -113,21 +117,8 @@ def split_by(chaine: str, lenght: int) -> list:
         
           
 if __name__ == "__main__":
-    hide("Je fais un teste plus performant avec un texte plus grand voir si ca marche", "eren.png")
+    # hide("Je fais un teste plus performant avec un texte plus grand voir si ca marche", "eren.png")
     read("cache.png")
     
-    
-    # chaine = "010010100110010100100000011101000110010101110011011101000110010100100000011101010110111000100000"
-    # split_by(chaine, 8)
-    
-    """
-    01001010011001010010000001110100011001010111001101110100011001010010000001110101011011100010000001110000011
-    0010101010111010100100000011011000110000100100000011100100110010101100111011011000110010100100000011001000
-    11001010111001100100000001100110011000100100000011000110110000101110010011000010110
-    001101110100011001010111001001100101011100110010000001110110011011110110100101110010001000000111001101101001
-    
-    0100101001100101001000000111010001100101011100110111010001100101001000000111010101101110001000000111000001100
-    101011101010010000001101100011000010010000001110010011001010110011101101100011001010010000
-    """
     
     
