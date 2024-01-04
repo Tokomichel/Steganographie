@@ -72,12 +72,16 @@ def read(image: str, encode_lenght: int = 16):
 
     tour = 0
     message = ""
+    clear_message = ""
     step = message_lenght + encode_lenght
     for i in range(len(data)):
         for j in range(len(data[i])):
             for k in range(len(data[i][j])):
                 if tour >= encode_lenght:
                     message += bin(data[i][j][k])[-1]
+                    if len(message) >= 8:
+                        clear_message += chr(int(message, 2))
+                        message = ""
                 tour += 1
                 if tour >= step:
                     break
@@ -86,36 +90,12 @@ def read(image: str, encode_lenght: int = 16):
         if tour >= step:
             break
 
-    # on converti le message en chaine de caractere
-    # sans oublier que chaque lettre etait encodée sur 8 bits
-    clear_message = ""
-    x = 0
-    liste = split_by(message, 8)
-
-    for elt in liste:
-        clear_message += chr(int(elt, 2))
 
     print(clear_message)
 
-
-def split_by(chaine: str, lenght: int) -> list:
-    x = 0
-    lettre = ""
-    liste = []
-    clear_liste = []
-    for elt in chaine:
-        lettre += elt
-
-        if x < (lenght - 1):
-            x += 1
-        else:
-            liste.append(lettre)
-            lettre = ""
-            x = 0
-
-    return liste
 
 
 if __name__ == "__main__":
     # hide("Je fais un teste plus performant avec un texte plus grand voir si ca marche", "eren.png")
     read("cache.png")
+
