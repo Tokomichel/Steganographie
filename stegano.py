@@ -19,7 +19,7 @@ def hide(message: str, image_loc: str, result_image: str = "cache.png"):
     taille_binaire = bin(len(message_binaire))[2:]  # on converti en binaire la taille du message
 
     # on determine la longueur en binaire de la taille.
-    # on encode la taille sur 16 bits ainsi on aura environ 2ko d'espace
+    # on encode la taille sur 16 bits ainsi on aura environ 2kbits d'espace
     while len(taille_binaire) < 16:
         taille_binaire = "0" + taille_binaire
 
@@ -54,7 +54,7 @@ def read(image: str, encode_lenght: int = 16):
     taille_message = ""
     x = 0
 
-    # on sait que la taille a ete encoder sur 8 bits
+    # on sait que la taille a ete encoder sur "encode_lenght" bits
     for i in range(len(data)):
         for j in range(len(data[i])):
             for k in range(len(data[i][j])):
@@ -69,25 +69,25 @@ def read(image: str, encode_lenght: int = 16):
             break
 
     message_lenght = int(taille_message, 2)
-    print(f"taille du message: {message_lenght}, taille message bin: {taille_message}")
 
     tour = 0
     message = ""
+    step = message_lenght + encode_lenght
     for i in range(len(data)):
         for j in range(len(data[i])):
             for k in range(len(data[i][j])):
                 if tour >= encode_lenght:
                     message += bin(data[i][j][k])[-1]
                 tour += 1
-                if tour >= (message_lenght + encode_lenght):
+                if tour >= step:
                     break
-            if tour >= (message_lenght + encode_lenght):
+            if tour >= step:
                 break
-        if tour >= (message_lenght + encode_lenght):
+        if tour >= step:
             break
 
-            # on converti le message en chaine de caractere
-    # sans oublier que chaque lettre etait encodee sur 8 bits
+    # on converti le message en chaine de caractere
+    # sans oublier que chaque lettre etait encodée sur 8 bits
     clear_message = ""
     x = 0
     liste = split_by(message, 8)
